@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.random.mtrand import randint
-from math import ceil, log10
 from time import perf_counter
 from utils import *
 from svd_func import *
@@ -64,6 +63,26 @@ def execute_t_times(t, svd_func, A, k):
     plt.show()
     
     return
+
+
+
+
+def erreurs_rangFixe(k=50):
+    plt.figure(figsize=(10, 6))
+    plt.title("SVD error with matrix size ascending")
+    
+    sizes = [100, 500, 1000]#, 5000, 10000]
+    errors_exactsvd = []
+    for size in sizes:
+        M = rankk_random_matrix(size, size, k)
+        errors_exactsvd.append(np.linalg.norm(svd_regular(M) - M))
+    
+    errors_rsvd = []
+    for size in sizes: 
+        M = rankk_random_matrix(size, size, k)
+        errors_rsvd.append(np.linalg.norm(svd_rand_gaussian(M, k), M))
+    
+    return errors_exactsvd, errors_rsvd
 
 
 def print_result(error, magnitude, duration, name):

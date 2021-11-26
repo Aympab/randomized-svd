@@ -2,7 +2,15 @@ import numpy as np
 from numpy.random.mtrand import randint
 from utils import *
 
-def svd_regular(A):
+
+def reconstruct(u, s, vt, k=0):
+    if k != 0:
+        return u[:, :k].dot(s[:k, np.newaxis] * vt[:k, :])
+    else:
+        return u.dot(s[:, np.newaxis] * vt)
+
+
+def svd_regular(A, k=0):
     """Computes the regular SVD for A and reconstructs A with U, S, and V
 
     Args:
@@ -12,8 +20,7 @@ def svd_regular(A):
         np.array: The reconstructed matrix U.S.Vt
     """    
     U, S, Vt = np.linalg.svd(A, full_matrices=False)
-    
-    return U@np.diag(S)@Vt
+    return reconstruct(U, S, Vt, k=k)
 
 
 def svd_rand_uniform(A, k):
@@ -48,7 +55,7 @@ def svd_rand_uniform(A, k):
     reconstructed_U = Q @ U_tilde
     
     #And we return the A_tilde, our reconstructed matrix
-    return reconstructed_U @ np.diag(S_tilde)@Vt_tilde
+    return reconstruct(reconstructed_U , S_tilde, Vt_tilde)
 
 
 def svd_rand_columns(A, k):
@@ -73,14 +80,14 @@ def svd_rand_columns(A, k):
         c[random_int] = 1
         
 
-    Y = A@Omega
+    Y = A @ Omega
     Q,R = np.linalg.qr(Y)   
      
     B = Q.T @ A    
     U_tilde, S_tilde, Vt_tilde = np.linalg.svd(B, full_matrices=False)
     reconstructed_U = Q @ U_tilde
     
-    return reconstructed_U @ np.diag(S_tilde)@Vt_tilde
+    return reconstruct(reconstructed_U, S_tilde, Vt_tilde)
 
 
 def svd_rand_gaussian(A, k):
@@ -98,12 +105,11 @@ def svd_rand_gaussian(A, k):
     #This time Omega is filled with random values generated from a standard normal distribution law
     Omega = gaussianMatrixGenerator(n,k)
 
-    Y = A@Omega
+    Y = A @ Omega
     Q,R = np.linalg.qr(Y)
     B = Q.T @ A
 
     U_tilde, S_tilde, Vt_tilde = np.linalg.svd(B, full_matrices=False)
     reconstructed_U = Q @ U_tilde
 
-
-    return reconstructed_U @ np.diag(S_tilde)@Vt_tilde
+    return reconstruct(reconstructed_U, S_tilde, Vt_tilde)
