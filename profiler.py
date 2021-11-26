@@ -65,24 +65,20 @@ def execute_t_times(t, svd_func, A, k):
     return
 
 
-
-
-def erreurs_rangFixe(k=50):
-    plt.figure(figsize=(10, 6))
-    plt.title("SVD error with matrix size ascending")
-    
-    sizes = [100, 500, 1000]#, 5000, 10000]
+def erreurs_rangFixe(sizes, k=50):
     errors_exactsvd = []
+    errors_rsvd_gauss = []
+    errors_rsvd_uni = []
+    errors_rsvd_col = []
     for size in sizes:
         M = rankk_random_matrix(size, size, k)
-        errors_exactsvd.append(np.linalg.norm(svd_regular(M) - M))
+        errors_exactsvd.append(np.linalg.norm(svd_regular(M, k=k) - M))
+
+        errors_rsvd_gauss.append(np.linalg.norm(svd_rand_gaussian(M, k) - M))
+        errors_rsvd_uni.append(np.linalg.norm(svd_rand_uniform(M, k) - M))
+        errors_rsvd_col.append(np.linalg.norm(svd_rand_columns(M, k) - M))
     
-    errors_rsvd = []
-    for size in sizes: 
-        M = rankk_random_matrix(size, size, k)
-        errors_rsvd.append(np.linalg.norm(svd_rand_gaussian(M, k), M))
-    
-    return errors_exactsvd, errors_rsvd
+    return errors_exactsvd, errors_rsvd_gauss, errors_rsvd_uni, errors_rsvd_col
 
 
 def print_result(error, magnitude, duration, name):

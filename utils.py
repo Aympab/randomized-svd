@@ -39,8 +39,6 @@ def rankk_random_matrix(m, n, rank):
     for i in range(rank, n):
         shape = mat.shape
         w = np.random.uniform(low = 0, high = 1, size = shape[1])
-        mat = np.append(mat, [w + np.random.normal(0, 0.025, size=m)], axis=0)
+        mat = np.append(mat, [w + np.random.normal(0, 0.00025, size=m)], axis=0)
 
     return np.asarray(mat).transpose()
-
-rankk_random_matrix(10, 5, 2).shape
