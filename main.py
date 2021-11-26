@@ -21,7 +21,7 @@ size = m*n
 print("Matrix shape :", A.shape)
 print("Total size :", size)
 
-k = 2500
+k = 500
 print("k : ", k) #Numbers of colums to project for estimation 
 
 plt.figure(figsize=figsize)
@@ -56,7 +56,7 @@ plt.imshow(A.T, cmap='gray')
 ############################################################
 #Computing randomized svp with uniform random (random features)
 
-execute_t_times(20, svd_rand_uniform, A, k) 
+# execute_t_times(20, svd_rand_uniform, A, k) 
 
 
 # print_result(err, mag, dur, "Randomized uniform")
