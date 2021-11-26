@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
+from math import ceil, log10
 
 figsize=(6866/500, 2386/500)
 # figsize = (6946/700,3906/700)
@@ -30,3 +31,31 @@ def gaussianMatrixGenerator(m, n, param = (0, 1)):
     if ((shape[0] == 1) or (shape[1] == 1)):
         omega = omega.flatten()
     return omega
+
+
+def compute_error(A, A_tilde):
+    """Computes the exact error and RMS' magnitude for two matrixes. 
+
+    Args:
+        A (np.array): The original matrix 
+        A_tilde (np.array): The approximated matrix with which we want to compute the error
+
+    Returns:
+        exact_error: the exact error overall for the matrix (summ of each component's errors)
+        rms_magnitude: the exact error divided by the size of the matrix, to the log10
+    """    
+    m,n  = A.shape
+    size = m*n
+    exact_error = abs(np.linalg.norm(A - A_tilde))
+    rms_magnitude = ceil(log10(exact_error/size))
+    return exact_error, rms_magnitude
+
+def print_result(error, magnitude, duration, name):
+    print("\n####################################################################")
+    print(name)
+    print(">>> Duration : {:.5f} sec.".format(duration))
+    print(">>> Rooted mean squared Error (RMSE) : 10e" + str(magnitude))
+    print(">>> Rooted sum squared Erros (RSSE)  : " + str(error))
+    print("####################################################################")
+    
+    return

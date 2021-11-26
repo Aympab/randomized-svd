@@ -65,13 +65,3 @@ def execute_t_times(t, svd_func, A, k):
     
     return
 
-
-def print_result(error, magnitude, duration, name):
-    print("\n####################################################################")
-    print(name)
-    print(">>> Duration : {:.5f} sec.".format(duration))
-    print(">>> Error : 10e" + str(magnitude))
-    print(">>> Exact error RMS : " + str(error))
-    print("####################################################################")
-    
-    return

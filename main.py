@@ -37,7 +37,7 @@ plt.imshow(A.T, cmap='gray')
 # A_tilde = svd_regular(A)
 # end = perf_counter()
  
-# print("\n####################################################################")
+# # print("\n####################################################################")
 # print("Regular SVD")
 # print(">>> Duration : {:.5f} sec.".format(end-start))
 # rms = abs(np.linalg.norm(A - A_tilde))
