@@ -8,10 +8,9 @@ from profiler import *
 
 # Transform the image in a matrix
 # img = getColouredImage('./fat.jpg')
-img = getColouredImage('./panorama.jpg')
+img = getColouredImage('./resources/small_6946x3906.jpg')
 # img = getColouredImage('./12096×8048.jpg')
 # img = getColouredImage('./soiree.jpg')
-
 img = toGrayScale(img)
 
 A = np.array(img).transpose() #we transpose because the pic is horizontal
@@ -25,6 +24,9 @@ print("Total size :", size)
 k = 2500
 print("k : ", k) #Numbers of colums to project for estimation 
 
+plt.figure(figsize=figsize)
+plt.title("Original BW pic")    
+plt.imshow(A.T, cmap='gray')
 
 
 ############################################################
@@ -66,6 +68,17 @@ execute_t_times(20, svd_rand_uniform, A, k)
 # start = perf_counter()  
 # A_tilde = svd_rand_uniform(A, k)
 # end = perf_counter()
+
+# plt.figure(figsize=figsize)
+# plt.title("Randomized uniform SVD image")    
+# plt.imshow(A_tilde.T, cmap='gray')
+
+
+# r = int(0.25*len(S_tilde)) 
+# compressed = reconstructed_U[:,:r].dot(S_tilde[:r, np.newaxis]*Vt_tilde[:r,:])
+# compressed = compressed.astype(int)
+# plt.figure("25%")
+# plt.imshow(compressed.T, cmap='gray')
 
 # print("\n####################################################################")
 # print("Randomized SVD using uniform law")

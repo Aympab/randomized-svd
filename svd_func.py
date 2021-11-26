@@ -46,6 +46,8 @@ def svd_rand_uniform(A, k):
 
     #We reconstruct the left singular vectors of by re-projecting by Q (before it was Qt)
     reconstructed_U = Q @ U_tilde
+      
+    
     
     #And we return the A_tilde, our reconstructed matrix
     return reconstructed_U @ np.diag(S_tilde)@Vt_tilde

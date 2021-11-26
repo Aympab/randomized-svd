@@ -10,7 +10,7 @@ def getColouredImage(path):
     img_colour = Image.open(path)
     plt.figure(figsize=figsize)
     plt.imshow(img_colour)
-    plt.title("Original image")
+    plt.title("Original coloured image")
     return img_colour
 
 def toGrayScale(img):
