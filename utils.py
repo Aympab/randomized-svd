@@ -52,8 +52,8 @@ def compute_error(A, A_tilde):
         A_tilde (np.array): The approximated matrix with which we want to compute the error
 
     Returns:
-        exact_error: the exact error overall for the matrix (summ of each component's errors)
-        rms_magnitude: the exact error divided by the size of the matrix, to the log10
+        rsse : the exact error overall for the matrix (summ of each component's errors)
+        rmse magnitude: the exact error divided by the size of the matrix, to the log10
     """    
     m,n  = A.shape
     size = m*n
