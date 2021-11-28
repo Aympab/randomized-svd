@@ -5,7 +5,6 @@ from math import ceil, log10
 from time import perf_counter
 from utils import *
 from svd_func import *
-import os
 
 
 #RAJOUTER LERREUR / ERREUR TOTALE
