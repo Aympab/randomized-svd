@@ -32,6 +32,17 @@ def gaussianMatrixGenerator(m, n, param = (0, 1)):
         omega = omega.flatten()
     return omega
 
+def rankk_random_matrix_generator(m, n, rank):
+    mat = np.empty((0,m))
+    for i in range(rank):
+        mat = np.append(mat, [np.random.normal(100, 75, size=m)], axis=0)
+        
+    for i in range(rank, n):
+        shape = mat.shape
+        w = np.random.uniform(low = 0, high = 1, size = shape[1])
+        mat = np.append(mat, [w + np.random.normal(0, 0.00025, size=m)], axis=0)
+
+    return np.asarray(mat).transpose()
 
 def compute_error(A, A_tilde):
     """Computes the exact error and RMS' magnitude for two matrixes. 
@@ -59,3 +70,5 @@ def print_result(error, magnitude, duration, name):
     print("####################################################################")
     
     return
+
+
