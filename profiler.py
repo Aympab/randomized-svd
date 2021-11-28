@@ -5,6 +5,7 @@ from math import ceil, log10
 from time import perf_counter
 from utils import *
 from svd_func import *
+import os
 
 
 #RAJOUTER LERREUR / ERREUR TOTALE
@@ -33,7 +34,9 @@ def execute_t_times(t, svd_func, A, k):
     
     # print(tab_k)
     for m_k in tab_k:
-        print("({}/{}) Running SVD with k = {}...".format(i, len(tab_k),m_k))
+        
+        # os.system('cls' if os.name == 'nt' else "printf '\033c'")
+        # print("({}/{}) Running SVD with k = {}...".format(i, len(tab_k),m_k))
         start = perf_counter()  
         A_tilde = svd_func(A,m_k) #compute A_tild using randomized svd
         end = perf_counter()
@@ -65,3 +68,38 @@ def execute_t_times(t, svd_func, A, k):
     
     return
 
+def fixed_rank_errors_random_matrixes(sizes, k=50):    
+    duration_exactsvd = []
+    duration_rsvd_gauss = []
+    duration_rsvd_uni = []
+    duration_rsvd_col = []
+    
+    errors_exactsvd = []
+    errors_rsvd_gauss = []
+    errors_rsvd_uni = []
+    errors_rsvd_col = []
+    for size in sizes:
+        M = rankk_random_matrix_generator(size, size, k)
+
+        s = perf_counter()
+        errors_exactsvd.append(np.linalg.norm(svd_regular(M, k=k) - M))
+        e = perf_counter()
+        duration_exactsvd.append(e - s)
+
+        s = perf_counter()
+        errors_rsvd_gauss.append(np.linalg.norm(svd_rand_gaussian(M, k) - M))
+        e = perf_counter()
+        duration_rsvd_gauss.append(e - s)
+        
+        s = perf_counter()
+        errors_rsvd_uni.append(np.linalg.norm(svd_rand_uniform(M, k) - M))
+        e = perf_counter()
+        duration_rsvd_uni.append(e - s)
+        
+        s = perf_counter()
+        errors_rsvd_col.append(np.linalg.norm(svd_rand_columns(M, k) - M))
+        e = perf_counter()
+        duration_rsvd_col.append(e - s)
+        
+
+    return [errors_exactsvd, errors_rsvd_gauss, errors_rsvd_uni, errors_rsvd_col], [duration_exactsvd, duration_rsvd_gauss, duration_rsvd_uni, duration_rsvd_col]
