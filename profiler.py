@@ -66,6 +66,18 @@ def execute_t_times(t, svd_func, A, k):
 
 
 def erreurs_rangFixe(sizes, k=50):
+    """Executes exact SVD and all randomized SVD on different sized generated square matrices, computes the error
+
+    Args:
+        sizes (list of strings): square matrix sizes to try
+        k (int): number max of columns to use in the randomized svd
+
+    Returns:
+        errors_exactsvd: list of approximation error of exact svd
+        errors_rsvd_gauss: list of approximation error of r-svd with gaussian RM
+        errors_rsvd_uni: list of approximation error of r-svd with uniform RM
+        errors_rsvd_col: list of approximation error of r-svd with column sampling
+    """
     errors_exactsvd = []
     errors_rsvd_gauss = []
     errors_rsvd_uni = []
@@ -79,6 +91,41 @@ def erreurs_rangFixe(sizes, k=50):
         errors_rsvd_col.append(np.linalg.norm(svd_rand_columns(M, k) - M))
     
     return errors_exactsvd, errors_rsvd_gauss, errors_rsvd_uni, errors_rsvd_col
+
+
+def erreurs_rangFixe_photos(photos, k=100): # En chantier (je m'appelle teuse)
+    """Executes exact SVD and all randomized SVD on different sized photos, computes the error
+
+    Args:
+        photos (list of strings): photo paths
+        k (int): number max of columns to use in the randomized svd
+
+    Returns:
+        errors_exactsvd: list of approximation error of exact svd
+        errors_rsvd_gauss: list of approximation error of r-svd with gaussian RM
+        errors_rsvd_uni: list of approximation error of r-svd with uniform RM
+        errors_rsvd_col: list of approximation error of r-svd with column sampling
+        sizes: list of matrix sizes
+    """
+    errors_exactsvd = []
+    errors_rsvd_gauss = []
+    errors_rsvd_uni = []
+    errors_rsvd_col = []
+    sizes = []
+    for img in photos:
+        M = toGrayScale(getColouredImage(img))
+        shape = M.shape
+        if shape[0] < shape[1]:
+            M = M.transpose()
+        size = shape[0] * shape[1] 
+
+        errors_exactsvd.append(np.linalg.norm(svd_regular(M, k=k) - M))
+
+        errors_rsvd_gauss.append(np.linalg.norm(svd_rand_gaussian(M, k) - M))
+        errors_rsvd_uni.append(np.linalg.norm(svd_rand_uniform(M, k) - M))
+        errors_rsvd_col.append(np.linalg.norm(svd_rand_columns(M, k) - M))
+    
+    return errors_exactsvd, errors_rsvd_gauss, errors_rsvd_uni, errors_rsvd_col, sizes
 
 
 def print_result(error, magnitude, duration, name):
