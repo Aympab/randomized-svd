@@ -10,7 +10,7 @@ def reconstruct(u, s, vt, k=0):
         return u.dot(s[:, np.newaxis] * vt)
 
 
-def svd_regular(A, k=0):
+def svd_regular(A, k=0, return_matrices=False):
     """Computes the regular SVD for A and reconstructs A with U, S, and V
 
     Args:
@@ -20,10 +20,13 @@ def svd_regular(A, k=0):
         np.array: The reconstructed matrix U.S.Vt
     """    
     U, S, Vt = np.linalg.svd(A, full_matrices=False)
-    return reconstruct(U, S, Vt, k=k)
+    if return_matrices:
+        return U, S, Vt
+    else:
+        return reconstruct(U, S, Vt, k=k)
 
 
-def svd_rand_uniform(A, k):
+def svd_rand_uniform(A, k, return_matrices=False):
     """Computes a randomized SVD for A using the uniform law
 
     Args:
@@ -54,11 +57,14 @@ def svd_rand_uniform(A, k):
     #We reconstruct the left singular vectors of by re-projecting by Q (before it was Qt)
     reconstructed_U = Q @ U_tilde
     
-    #And we return the A_tilde, our reconstructed matrix
-    return reconstruct(reconstructed_U , S_tilde, Vt_tilde)
+    #And we return the A_tilde, our reconstructed matrix    
+    if return_matrices:
+        return reconstructed_U , S_tilde, Vt_tilde
+    else:
+        return reconstruct(reconstructed_U , S_tilde, Vt_tilde)
 
 
-def svd_rand_columns(A, k):
+def svd_rand_columns(A, k, return_matrices = False):
     """Computes a randomized SVD for A using the random columns method
 
     Args:
@@ -87,10 +93,13 @@ def svd_rand_columns(A, k):
     U_tilde, S_tilde, Vt_tilde = np.linalg.svd(B, full_matrices=False)
     reconstructed_U = Q @ U_tilde
     
-    return reconstruct(reconstructed_U, S_tilde, Vt_tilde)
+    if return_matrices:
+        return reconstructed_U , S_tilde, Vt_tilde
+    else:
+        return reconstruct(reconstructed_U , S_tilde, Vt_tilde)
 
 
-def svd_rand_gaussian(A, k):
+def svd_rand_gaussian(A, k, return_matrices = False):
     """Computes a randomized SVD for A using a gaussian law
 
     Args:
@@ -112,4 +121,7 @@ def svd_rand_gaussian(A, k):
     U_tilde, S_tilde, Vt_tilde = np.linalg.svd(B, full_matrices=False)
     reconstructed_U = Q @ U_tilde
 
-    return reconstruct(reconstructed_U, S_tilde, Vt_tilde)
+    if return_matrices:
+        return reconstructed_U , S_tilde, Vt_tilde
+    else:
+        return reconstruct(reconstructed_U , S_tilde, Vt_tilde)

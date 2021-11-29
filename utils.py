@@ -1,7 +1,10 @@
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 from math import ceil, log10
+
 
 figsize=(6866/500, 2386/500)
 # figsize = (6946/700,3906/700)
@@ -9,9 +12,9 @@ figsize=(6866/500, 2386/500)
 
 def getColouredImage(path):
     img_colour = Image.open(path)
-    plt.figure(figsize=figsize)
-    plt.imshow(img_colour)
-    plt.title("Original coloured image")
+    #plt.figure(figsize=figsize)
+    #plt.imshow(img_colour)
+    #plt.title("Original coloured image")
     return img_colour
 
 def toGrayScale(img):
