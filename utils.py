@@ -45,7 +45,7 @@ def rankk_random_matrix_generator(m, n, rank):
     return np.asarray(mat).transpose()
 
 def compute_error(A, A_tilde):
-    """Computes the exact error and RMS' magnitude for two matrixes. 
+    """Computes the exact error and RMS' magnitude for two matrices. 
 
     Args:
         A (np.array): The original matrix 

@@ -53,9 +53,11 @@ def execute_t_times(t, svd_func, A, k, verbose=1):
 
     axes[0].set_title('SVD compute duration with k ascending')
     axes[0].plot(tab_k, duration, color='b', label='duration')
-    axes[1].set_title("SVD exact error (size = {})".format(size))
+    axes[1].set_title("truncated SVD error (size = {})".format(size))
     axes[1].plot(tab_k, error, color='r', label='error')  
     
+    axes[0].grid()
+    axes[1].grid()
     plt.show()
     
     return
