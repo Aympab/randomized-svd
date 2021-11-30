@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from numpy.core.fromnumeric import size
 import pandas as pd
 from numpy.random.mtrand import randint
 from math import ceil, log10
@@ -9,7 +10,7 @@ from svd_func import *
 
 
 #RAJOUTER LERREUR / ERREUR TOTALE
-def execute_t_times(t, svd_func, A, k, verbose=1):
+def execute_t_times(t, svd_func, A, k, kernel, verbose=1):
     """Executes t times a randomized svd function and plots duration and error for k ascending 
 
     Args:
@@ -37,7 +38,7 @@ def execute_t_times(t, svd_func, A, k, verbose=1):
         if(verbose == 1) :
             print("({}/{}) Running SVD with k = {}...".format(i, len(tab_k),m_k))
         start = perf_counter()  
-        A_tilde = svd_func(A,m_k) #compute A_tild using randomized svd
+        A_tilde = svd_func(A, m_k, kernel=kernel) #compute A_tild using randomized svd
         end = perf_counter()
     
         #get the sum of all error for each composant
@@ -68,11 +69,13 @@ def fixed_rank_errors_random_matrixes(sizes, k=50):
     duration_rsvd_gauss = []
     duration_rsvd_uni = []
     duration_rsvd_col = []
+    duration_rsvd_DFR = []
     
     errors_exactsvd = []
     errors_rsvd_gauss = []
     errors_rsvd_uni = []
     errors_rsvd_col = []
+    errors_rsvd_DFR = []
     for size in sizes:
         M = rankk_random_matrix_generator(size, size, k)
 
@@ -82,36 +85,42 @@ def fixed_rank_errors_random_matrixes(sizes, k=50):
         duration_exactsvd.append(e - s)
 
         s = perf_counter()
-        errors_rsvd_gauss.append(np.linalg.norm(svd_rand_gaussian(M, k) - M))
+        errors_rsvd_gauss.append(np.linalg.norm(r_svd(M, k, kernel="gaussian") - M))
         e = perf_counter()
         duration_rsvd_gauss.append(e - s)
         
         s = perf_counter()
-        errors_rsvd_uni.append(np.linalg.norm(svd_rand_uniform(M, k) - M))
+        errors_rsvd_uni.append(np.linalg.norm(r_svd(M, k, kernel="uniform") - M))
         e = perf_counter()
         duration_rsvd_uni.append(e - s)
         
         s = perf_counter()
-        errors_rsvd_col.append(np.linalg.norm(svd_rand_columns(M, k) - M))
+        errors_rsvd_col.append(np.linalg.norm(r_svd(M, k, kernel="colsampling") - M))
         e = perf_counter()
         duration_rsvd_col.append(e - s)
+
+        s = perf_counter()
+        errors_rsvd_DFR.append(np.linalg.norm(r_svd(M, k, kernel="DFR") - M))
+        e = perf_counter()
+        duration_rsvd_DFR.append(e - s)
         
 
     # Plot compressed and original image
 
-    errors = [errors_exactsvd, errors_rsvd_gauss, errors_rsvd_uni, errors_rsvd_col]
-    durations = [duration_exactsvd, duration_rsvd_gauss, duration_rsvd_uni, duration_rsvd_col]
+    errors = [errors_exactsvd, errors_rsvd_gauss, errors_rsvd_uni, errors_rsvd_col, errors_rsvd_DFR]
+    durations = [duration_exactsvd, duration_rsvd_gauss, duration_rsvd_uni, duration_rsvd_col, duration_rsvd_DFR]
         
     plt.figure()
-    plt.title("SVD error with matrix approximation of rank K = {}".format(50))
+    plt.title("SVD error with matrix approximation of rank K = {}".format(k))
     plt.plot(sizes, errors[0], label = "exact SVD")
     plt.plot(sizes, errors[1], label = "Random SVD (Gauss)")
     plt.plot(sizes, errors[2], label = "Random SVD (Uniform)")
     plt.plot(sizes, errors[3], label = "Random SVD (Col sampling)")
+    plt.plot(sizes, errors[4], label = "Random SVD (DFR)")
     plt.xlabel("Size of Square Matrix N")
     plt.ylabel("Reconstruction error of svd")
     plt.grid()
-    plt.legend(loc='center right', bbox_to_anchor=(2, 0.5))
+    plt.legend()
 
     plt.figure()
     plt.title("SVD compute duration")
@@ -119,10 +128,11 @@ def fixed_rank_errors_random_matrixes(sizes, k=50):
     plt.plot(sizes, durations[1], label = "Random SVD (Gauss)")
     plt.plot(sizes, durations[2], label = "Random SVD (Uniform)")
     plt.plot(sizes, durations[3], label = "Random SVD (Col sampling)")
+    plt.plot(sizes, durations[4], label = "Random SVD (DFR)")
     plt.xlabel("Size of Square Matrix N")
     plt.ylabel("Compute time")
     plt.grid()
-    # plt.legend()
+    plt.legend()
     
     plt.show()
 
@@ -171,80 +181,104 @@ def fixed_rank_errors_photos(paths, k=100):
     duration_rsvd_gauss = []
     duration_rsvd_uni = []
     duration_rsvd_col = []
+    duration_rsvd_DFR = []
     
     errors_exactsvd = []
     errors_rsvd_gauss = []
     errors_rsvd_uni = []
     errors_rsvd_col = []
+    errors_rsvd_DFR = []
 
     sizes = []
+    size_text_labels = []
+    svd_ratio = []
     for path in paths:
         M = np.asarray(toGrayScale(getColouredImage(path)))
         shape = M.shape
         if shape[0] < shape[1]:
             M = M.transpose()
         sizes.append(shape[0] * shape[1])
+        size_text_labels.append(str(int(shape[0]/1000)) + "kx" + str(int(shape[1]/1000)) + "k")
 
         error, duration = cache_svd_photo(path, M, k)
         errors_exactsvd.append(error)
         duration_exactsvd.append(duration)
+        svd_ratio.append(error / (shape[0] * shape[1]))
 
         s = perf_counter()
-        errors_rsvd_gauss.append(np.linalg.norm(svd_rand_gaussian(M, k) - M))
+        errors_rsvd_gauss.append(np.linalg.norm(r_svd(M, k, kernel="gaussian") - M))
         e = perf_counter()
         duration_rsvd_gauss.append(e - s)
         
         s = perf_counter()
-        errors_rsvd_uni.append(np.linalg.norm(svd_rand_uniform(M, k) - M))
+        errors_rsvd_uni.append(np.linalg.norm(r_svd(M, k, kernel="uniform") - M))
         e = perf_counter()
         duration_rsvd_uni.append(e - s)
         
         s = perf_counter()
-        errors_rsvd_col.append(np.linalg.norm(svd_rand_columns(M, k) - M))
+        errors_rsvd_col.append(np.linalg.norm(r_svd(M, k, kernel="colsampling") - M))
         e = perf_counter()
         duration_rsvd_col.append(e - s)
+
+        s = perf_counter()
+        errors_rsvd_DFR.append(np.linalg.norm(r_svd(M, k, kernel="DFR") - M))
+        e = perf_counter()
+        duration_rsvd_DFR.append(e - s)
+        
         
 
     sizes = np.asarray(sizes)
     ordre = np.argsort(sizes)
     sizes = sizes[ordre]
+    size_text_labels = np.asarray(size_text_labels)[ordre]
     errors_exactsvd = np.asarray(errors_exactsvd)[ordre]
     errors_rsvd_gauss = np.asarray(errors_rsvd_gauss)[ordre]
     errors_rsvd_uni = np.asarray(errors_rsvd_uni)[ordre]
     errors_rsvd_col = np.asarray(errors_rsvd_col)[ordre]
+    errors_rsvd_DFR = np.asarray(errors_rsvd_DFR)[ordre]
     duration_exactsvd = np.asarray(duration_exactsvd)[ordre]
     duration_rsvd_gauss = np.asarray(duration_rsvd_gauss)[ordre]
     duration_rsvd_uni = np.asarray(duration_rsvd_uni)[ordre]
     duration_rsvd_col = np.asarray(duration_rsvd_col)[ordre]
+    duration_rsvd_DFR = np.asarray(duration_rsvd_DFR)[ordre]
     # Plot compressed and original image
 
-    errors = [errors_exactsvd, errors_rsvd_gauss, errors_rsvd_uni, errors_rsvd_col]
-    durations = [duration_exactsvd, duration_rsvd_gauss, duration_rsvd_uni, duration_rsvd_col]
+    errors = [errors_exactsvd, errors_rsvd_gauss, errors_rsvd_uni, errors_rsvd_col, errors_rsvd_DFR]
+    durations = [duration_exactsvd, duration_rsvd_gauss, duration_rsvd_uni, duration_rsvd_col, duration_rsvd_DFR]
         
-    plt.figure(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(10, 6))
     plt.title("SVD error with matrix approximation of rank K = {}".format(k))
     plt.plot(sizes, errors[0], label = "truncated SVD")
     plt.plot(sizes, errors[1], linestyle = "solid", label = "Random SVD (Gauss)")
     plt.plot(sizes, errors[2], linestyle = "dashed", label = "Random SVD (Uniform)")
     plt.plot(sizes, errors[3], linestyle = "dotted", label = "Random SVD (Col sampling)")
-    plt.xlabel("log(Size of Square Matrix N)")
+    plt.plot(sizes, errors[4], linestyle = "dotted", label = "Random SVD (DFR)")
+
+    for i, txt in enumerate(size_text_labels):
+        ax.annotate(txt, (sizes[i], np.max(np.asarray(errors)[:, i])))
+
+    plt.xlabel("log(Size of Matrix N)")
     plt.ylabel("Reconstruction error of svd")
     plt.xscale("log")
     plt.grid()
     plt.legend()
 
-    plt.figure(figsize=(10, 6))
+    fig2, ax2 = plt.subplots(figsize=(10, 6))
     plt.title("SVD compute duration")
     plt.plot(sizes, durations[0], label = "truncated SVD")
     plt.plot(sizes, durations[1], linestyle="solid", label = "Random SVD (Gauss)")
     plt.plot(sizes, durations[2], linestyle="dashed", label = "Random SVD (Uniform)")
     plt.plot(sizes, durations[3], linestyle="dotted", label = "Random SVD (Col sampling)")
+    plt.plot(sizes, durations[4], linestyle="dotted", label = "Random SVD (DFR)")
+    
+    for i, txt in enumerate(size_text_labels):
+        ax2.annotate(txt, (sizes[i], np.max(np.asarray(durations)[:, i])))
+
     plt.legend()
     plt.yscale("log")
-    plt.xlabel("Size of Square Matrix N")
+    plt.xlabel("Size of Matrix N")
     plt.ylabel("log(Compute time)")
     plt.grid()
     plt.legend()
     
     plt.show()
-

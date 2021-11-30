@@ -2,6 +2,7 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy.linalg
 from PIL import Image
 from math import ceil, log10
 
@@ -75,3 +76,21 @@ def print_result(error, magnitude, duration, name):
     return
 
 
+def DFR_random_matrix(n, l):
+    """ Creates a DFR matrix
+    """
+    if n < l:
+        raise ValueError(f"l ({l}) can't be higher than n ({n})")
+    D = np.random.uniform(-1, 1, size = n) + np.random.uniform(-1, 1, size = n) * 1.j
+    D = D / np.abs(D)
+    F = scipy.linalg.dft(n)
+    R = np.zeros(shape=(n, l)) 
+    deck = np.arange(l)
+
+    for i in range(R.shape[1]):
+        random_int = np.random.choice(deck)
+        R[random_int, i] = 1
+        idx = np.where(deck == random_int)[0][0]
+        deck = np.delete(deck, idx)
+
+    return np.abs(np.sqrt(1 / l) * np.multiply(D[:, None], F) @ R)

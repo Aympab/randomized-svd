@@ -10,28 +10,13 @@ def reconstruct(u, s, vt, k=0):
         return u.dot(s[:, np.newaxis] * vt)
 
 
-def svd_regular(A, k=0, return_matrices=False):
-    """Computes the regular SVD for A and reconstructs A with U, S, and V
-
-    Args:
-        A (np.array): The matrix which we want to compute SVD
-
-    Returns:
-        np.array: The reconstructed matrix U.S.Vt
-    """    
-    U, S, Vt = np.linalg.svd(A, full_matrices=False)
-    if return_matrices:
-        return U, S, Vt
-    else:
-        return reconstruct(U, S, Vt, k=k)
-
-
-def svd_rand_uniform(A, k, return_matrices=False):
+def r_svd(A, k=0, kernel="gaussian", return_matrices=False, power_iteration=0):
     """Computes a randomized SVD for A using the uniform law
 
     Args:
         A (np.array): The matrix which we want to compute SVD
         k (int): Number of columns projection used to estimate A
+        kernel (str): what method to use
 
     Returns:
         np.array: The reconstructed matrix U.S.Vt
@@ -40,10 +25,32 @@ def svd_rand_uniform(A, k, return_matrices=False):
     m, n = A.shape
     
     #We create a matrix Omega which has k vector of size n filled with random numbers
-    Omega = np.random.rand(n, k)
-    
+    if (kernel == "uniform"):
+        Omega = np.random.rand(n, k)
+    elif (kernel == "gaussian"):
+        Omega = gaussianMatrixGenerator(n,k)
+    elif (kernel == "colsampling"):
+        Omega = np.zeros(shape=(n,k))
+        #In each column, we put a 1 at a random position, 
+        #this will lead in choosing random columns of A to project  
+        for c in Omega :
+            random_int = randint(0, k)
+            c[random_int] = 1
+    elif (kernel == "DFR"):
+        Omega = DFR_random_matrix(n, k)
+    else:
+        raise ValueError("kernel must be either of 'uniform', 'gaussian', 'colsampling', 'DFR'.")
+
+
     #We randomly project k columns of A and create a Y matrix
-    Y = A@Omega
+    Y = A @ Omega
+    #Y = Y / np.linalg.norm(Y, axis=0)
+
+    #for i in range(power_iteration):
+    #    Y = A.T @ Y
+    #    Y = Y / np.linalg.norm(Y, axis=0)
+    #    Y = A @ Y 
+    #    Y = Y / np.linalg.norm(Y, axis=0)
 
     #We compute QR on Y because it is small (m,k)
     Q,R = np.linalg.qr(Y)
@@ -64,64 +71,18 @@ def svd_rand_uniform(A, k, return_matrices=False):
         return reconstruct(reconstructed_U , S_tilde, Vt_tilde)
 
 
-def svd_rand_columns(A, k, return_matrices = False):
-    """Computes a randomized SVD for A using the random columns method
+def svd_regular(A, k=0, return_matrices=False):
+    """Computes the regular SVD for A and reconstructs A with U, S, and V
 
     Args:
         A (np.array): The matrix which we want to compute SVD
-        k (int): Number of columns projection used to estimate A
 
     Returns:
         np.array: The reconstructed matrix U.S.Vt
     """    
-    m, n = A.shape
-    
-    #We create a matrix full of zeros
-    Omega = np.zeros(shape=(n,k))
-
-    #In each column, we put a 1 at a random position, 
-    #this will lead in choosing random columns of A to project  
-    for c in Omega :
-        random_int = randint(0, k)
-        c[random_int] = 1
-        
-
-    Y = A @ Omega
-    Q,R = np.linalg.qr(Y)   
-     
-    B = Q.T @ A    
-    U_tilde, S_tilde, Vt_tilde = np.linalg.svd(B, full_matrices=False)
-    reconstructed_U = Q @ U_tilde
-    
+    U, S, Vt = np.linalg.svd(A, full_matrices=False)
     if return_matrices:
-        return reconstructed_U , S_tilde, Vt_tilde
+        return U, S, Vt
     else:
-        return reconstruct(reconstructed_U , S_tilde, Vt_tilde)
+        return reconstruct(U, S, Vt, k=k)
 
-
-def svd_rand_gaussian(A, k, return_matrices = False):
-    """Computes a randomized SVD for A using a gaussian law
-
-    Args:
-        A (np.array): The matrix which we want to compute SVD
-        k (int): Number of columns projection used to estimate A
-
-    Returns:
-        np.array: The reconstructed matrix U.S.Vt
-    """ 
-    m, n = A.shape
-    
-    #This time Omega is filled with random values generated from a standard normal distribution law
-    Omega = gaussianMatrixGenerator(n,k)
-
-    Y = A @ Omega
-    Q,R = np.linalg.qr(Y)
-    B = Q.T @ A
-
-    U_tilde, S_tilde, Vt_tilde = np.linalg.svd(B, full_matrices=False)
-    reconstructed_U = Q @ U_tilde
-
-    if return_matrices:
-        return reconstructed_U , S_tilde, Vt_tilde
-    else:
-        return reconstruct(reconstructed_U , S_tilde, Vt_tilde)
