@@ -69,13 +69,13 @@ def fixed_rank_errors_random_matrixes(sizes, k=50):
     duration_rsvd_gauss = []
     duration_rsvd_uni = []
     duration_rsvd_col = []
-    duration_rsvd_DFR = []
+    #duration_rsvd_DFR = []
     
     errors_exactsvd = []
     errors_rsvd_gauss = []
     errors_rsvd_uni = []
     errors_rsvd_col = []
-    errors_rsvd_DFR = []
+    #errors_rsvd_DFR = []
     for size in sizes:
         M = rankk_random_matrix_generator(size, size, k)
 
@@ -99,16 +99,16 @@ def fixed_rank_errors_random_matrixes(sizes, k=50):
         e = perf_counter()
         duration_rsvd_col.append(e - s)
 
-        s = perf_counter()
-        errors_rsvd_DFR.append(np.linalg.norm(r_svd(M, k, kernel="DFR") - M))
-        e = perf_counter()
-        duration_rsvd_DFR.append(e - s)
+        #s = perf_counter()
+        #errors_rsvd_DFR.append(np.linalg.norm(r_svd(M, k, kernel="DFR") - M))
+        #e = perf_counter()
+        #duration_rsvd_DFR.append(e - s)
         
 
     # Plot compressed and original image
 
-    errors = [errors_exactsvd, errors_rsvd_gauss, errors_rsvd_uni, errors_rsvd_col, errors_rsvd_DFR]
-    durations = [duration_exactsvd, duration_rsvd_gauss, duration_rsvd_uni, duration_rsvd_col, duration_rsvd_DFR]
+    errors = [errors_exactsvd, errors_rsvd_gauss, errors_rsvd_uni, errors_rsvd_col]#, errors_rsvd_DFR]
+    durations = [duration_exactsvd, duration_rsvd_gauss, duration_rsvd_uni, duration_rsvd_col]#, duration_rsvd_DFR]
         
     plt.figure()
     plt.title("SVD error with matrix approximation of rank K = {}".format(k))
@@ -116,7 +116,7 @@ def fixed_rank_errors_random_matrixes(sizes, k=50):
     plt.plot(sizes, errors[1], label = "Random SVD (Gauss)")
     plt.plot(sizes, errors[2], label = "Random SVD (Uniform)")
     plt.plot(sizes, errors[3], label = "Random SVD (Col sampling)")
-    plt.plot(sizes, errors[4], label = "Random SVD (DFR)")
+    #plt.plot(sizes, errors[4], label = "Random SVD (DFR)")
     plt.xlabel("Size of Square Matrix N")
     plt.ylabel("Reconstruction error of svd")
     plt.grid()
@@ -128,7 +128,7 @@ def fixed_rank_errors_random_matrixes(sizes, k=50):
     plt.plot(sizes, durations[1], label = "Random SVD (Gauss)")
     plt.plot(sizes, durations[2], label = "Random SVD (Uniform)")
     plt.plot(sizes, durations[3], label = "Random SVD (Col sampling)")
-    plt.plot(sizes, durations[4], label = "Random SVD (DFR)")
+    #plt.plot(sizes, durations[4], label = "Random SVD (DFR)")
     plt.xlabel("Size of Square Matrix N")
     plt.ylabel("Compute time")
     plt.grid()

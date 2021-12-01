@@ -93,4 +93,28 @@ def DFR_random_matrix(n, l):
         idx = np.where(deck == random_int)[0][0]
         deck = np.delete(deck, idx)
 
-    return np.abs(np.sqrt(1 / l) * np.multiply(D[:, None], F) @ R)
+    return np.sqrt(1 / l) * np.multiply(D[:, None], F).real @ R
+
+"""
+def DFR_random_matrix(n, l, kind="hadamard"):
+    if n < l:
+        raise ValueError(f"l ({l}) can't be higher than n ({n})")
+    
+    #D = np.random.uniform(-1, 1, size = n) + np.random.uniform(-1, 1, size = n) * 1.j
+    #D = D / np.abs(D) 
+    D = np.random.randint(0, 2, size=n)
+    D[np.where(D == 0)] = -1
+
+    if (kind == "hadamard"):
+        H = scipy.linalg.hadamard(n)
+
+    R = np.zeros(shape=(n, l)) 
+    deck = np.arange(l)
+    for i in range(R.shape[1]):
+        random_int = np.random.choice(deck)
+        R[random_int, i] = 1
+        idx = np.where(deck == random_int)[0][0]
+        deck = np.delete(deck, idx)
+
+    return np.sqrt(n / l) * R @ H @ D
+"""
