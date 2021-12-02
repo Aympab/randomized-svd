@@ -3,6 +3,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.linalg
+from scipy.fft import dct
 from PIL import Image
 from math import ceil, log10
 
@@ -95,26 +96,43 @@ def DFR_random_matrix(n, l):
 
     return np.sqrt(1 / l) * np.multiply(D[:, None], F).real @ R
 
-"""
-def DFR_random_matrix(n, l, kind="hadamard"):
+
+def hadamard_random_matrix(n, l):
     if n < l:
         raise ValueError(f"l ({l}) can't be higher than n ({n})")
     
-    #D = np.random.uniform(-1, 1, size = n) + np.random.uniform(-1, 1, size = n) * 1.j
-    #D = D / np.abs(D) 
-    D = np.random.randint(0, 2, size=n)
+    size = 2 ** ceil(np.log(n)/np.log(2))
+
+    D = np.random.randint(0, 2, size=size) # n * n
     D[np.where(D == 0)] = -1
 
-    if (kind == "hadamard"):
-        H = scipy.linalg.hadamard(n)
+    H = scipy.linalg.hadamard(size) # n * n
 
-    R = np.zeros(shape=(n, l)) 
-    deck = np.arange(l)
+    R = np.zeros(shape=(size, l)) # l * n
+    deck = np.arange(size)
     for i in range(R.shape[1]):
         random_int = np.random.choice(deck)
         R[random_int, i] = 1
         idx = np.where(deck == random_int)[0][0]
         deck = np.delete(deck, idx)
 
-    return np.sqrt(n / l) * R @ H @ D
-"""
+    return (np.sqrt(size / l) * np.diag(D) @ H @ R)[:n]
+
+def DCT_random_matrix(n, l):
+    if n < l:
+        raise ValueError(f"l ({l}) can't be higher than n ({n})")
+
+    D = np.random.randint(0, 2, size=n) # n * n
+    D[np.where(D == 0)] = -1
+
+    F = dct(np.identity(n), axis=0, type=2, norm='ortho') # n * n
+
+    R = np.zeros(shape=(n, l)) # n*l
+    deck = np.arange(n)
+    for i in range(R.shape[1]):
+        random_int = np.random.choice(deck)
+        R[random_int, i] = 1
+        idx = np.where(deck == random_int)[0][0]
+        deck = np.delete(deck, idx)
+
+    return (np.sqrt(n / l) * np.diag(D) @ F @ R)[:n]

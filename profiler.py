@@ -69,13 +69,13 @@ def fixed_rank_errors_random_matrixes(sizes, k=50):
     duration_rsvd_gauss = []
     duration_rsvd_uni = []
     duration_rsvd_col = []
-    #duration_rsvd_DFR = []
+    #duration_rsvd_SRHT = []
     
     errors_exactsvd = []
     errors_rsvd_gauss = []
     errors_rsvd_uni = []
     errors_rsvd_col = []
-    #errors_rsvd_DFR = []
+    #errors_rsvd_SRHT = []
     for size in sizes:
         M = rankk_random_matrix_generator(size, size, k)
 
@@ -100,15 +100,15 @@ def fixed_rank_errors_random_matrixes(sizes, k=50):
         duration_rsvd_col.append(e - s)
 
         #s = perf_counter()
-        #errors_rsvd_DFR.append(np.linalg.norm(r_svd(M, k, kernel="DFR") - M))
+        #errors_rsvd_SRHT.append(np.linalg.norm(r_svd(M, k, kernel="SRHT") - M))
         #e = perf_counter()
-        #duration_rsvd_DFR.append(e - s)
+        #duration_rsvd_SRHT.append(e - s)
         
 
     # Plot compressed and original image
 
-    errors = [errors_exactsvd, errors_rsvd_gauss, errors_rsvd_uni, errors_rsvd_col]#, errors_rsvd_DFR]
-    durations = [duration_exactsvd, duration_rsvd_gauss, duration_rsvd_uni, duration_rsvd_col]#, duration_rsvd_DFR]
+    errors = [errors_exactsvd, errors_rsvd_gauss, errors_rsvd_uni, errors_rsvd_col]#, errors_rsvd_SRHT]
+    durations = [duration_exactsvd, duration_rsvd_gauss, duration_rsvd_uni, duration_rsvd_col]#, duration_rsvd_SRHT]
         
     plt.figure()
     plt.title("SVD error with matrix approximation of rank K = {}".format(k))
@@ -116,7 +116,7 @@ def fixed_rank_errors_random_matrixes(sizes, k=50):
     plt.plot(sizes, errors[1], label = "Random SVD (Gauss)")
     plt.plot(sizes, errors[2], label = "Random SVD (Uniform)")
     plt.plot(sizes, errors[3], label = "Random SVD (Col sampling)")
-    #plt.plot(sizes, errors[4], label = "Random SVD (DFR)")
+    #plt.plot(sizes, errors[4], label = "Random SVD (SRHT)")
     plt.xlabel("Size of Square Matrix N")
     plt.ylabel("Reconstruction error of svd")
     plt.grid()
@@ -128,7 +128,7 @@ def fixed_rank_errors_random_matrixes(sizes, k=50):
     plt.plot(sizes, durations[1], label = "Random SVD (Gauss)")
     plt.plot(sizes, durations[2], label = "Random SVD (Uniform)")
     plt.plot(sizes, durations[3], label = "Random SVD (Col sampling)")
-    #plt.plot(sizes, durations[4], label = "Random SVD (DFR)")
+    #plt.plot(sizes, durations[4], label = "Random SVD (SRHT)")
     plt.xlabel("Size of Square Matrix N")
     plt.ylabel("Compute time")
     plt.grid()
@@ -181,13 +181,15 @@ def fixed_rank_errors_photos(paths, k=100):
     duration_rsvd_gauss = []
     duration_rsvd_uni = []
     duration_rsvd_col = []
-    duration_rsvd_DFR = []
+    duration_rsvd_SRHT = []
+    duration_rsvd_DCT = []
     
     errors_exactsvd = []
     errors_rsvd_gauss = []
     errors_rsvd_uni = []
     errors_rsvd_col = []
-    errors_rsvd_DFR = []
+    errors_rsvd_SRHT = []
+    errors_rsvd_DCT = []
 
     sizes = []
     size_text_labels = []
@@ -221,9 +223,14 @@ def fixed_rank_errors_photos(paths, k=100):
         duration_rsvd_col.append(e - s)
 
         s = perf_counter()
-        errors_rsvd_DFR.append(np.linalg.norm(r_svd(M, k, kernel="DFR") - M))
+        errors_rsvd_SRHT.append(np.linalg.norm(r_svd(M, k, kernel="SRHT") - M))
         e = perf_counter()
-        duration_rsvd_DFR.append(e - s)
+        duration_rsvd_SRHT.append(e - s)
+
+        s = perf_counter()
+        errors_rsvd_DCT.append(np.linalg.norm(r_svd(M, k, kernel="DCT") - M))
+        e = perf_counter()
+        duration_rsvd_DCT.append(e - s)
         
         
 
@@ -232,27 +239,33 @@ def fixed_rank_errors_photos(paths, k=100):
     sizes = sizes[ordre]
     size_text_labels = np.asarray(size_text_labels)[ordre]
     errors_exactsvd = np.asarray(errors_exactsvd)[ordre]
-    errors_rsvd_gauss = np.asarray(errors_rsvd_gauss)[ordre]
-    errors_rsvd_uni = np.asarray(errors_rsvd_uni)[ordre]
-    errors_rsvd_col = np.asarray(errors_rsvd_col)[ordre]
-    errors_rsvd_DFR = np.asarray(errors_rsvd_DFR)[ordre]
+    errors_rsvd_gauss = np.asarray(errors_rsvd_gauss)[ordre] / errors_exactsvd
+    errors_rsvd_uni = np.asarray(errors_rsvd_uni)[ordre] / errors_exactsvd
+    errors_rsvd_col = np.asarray(errors_rsvd_col)[ordre] / errors_exactsvd
+    errors_rsvd_SRHT = np.asarray(errors_rsvd_SRHT)[ordre] / errors_exactsvd
+    errors_rsvd_DCT = np.asarray(errors_rsvd_DCT)[ordre] / errors_exactsvd
     duration_exactsvd = np.asarray(duration_exactsvd)[ordre]
     duration_rsvd_gauss = np.asarray(duration_rsvd_gauss)[ordre]
     duration_rsvd_uni = np.asarray(duration_rsvd_uni)[ordre]
     duration_rsvd_col = np.asarray(duration_rsvd_col)[ordre]
-    duration_rsvd_DFR = np.asarray(duration_rsvd_DFR)[ordre]
+    duration_rsvd_SRHT = np.asarray(duration_rsvd_SRHT)[ordre]
+    duration_rsvd_DCT = np.asarray(duration_rsvd_DCT)[ordre]
     # Plot compressed and original image
 
-    errors = [errors_exactsvd, errors_rsvd_gauss, errors_rsvd_uni, errors_rsvd_col, errors_rsvd_DFR]
-    durations = [duration_exactsvd, duration_rsvd_gauss, duration_rsvd_uni, duration_rsvd_col, duration_rsvd_DFR]
+    errors = [np.ones(shape=errors_exactsvd.shape), errors_rsvd_gauss, errors_rsvd_uni, \
+        errors_rsvd_col, errors_rsvd_SRHT, errors_rsvd_DCT]
+    durations = [duration_exactsvd, duration_rsvd_gauss, duration_rsvd_uni, duration_rsvd_col, \
+        duration_rsvd_SRHT, duration_rsvd_DCT]
         
     fig, ax = plt.subplots(figsize=(10, 6))
-    plt.title("SVD error with matrix approximation of rank K = {}".format(k))
+    plt.title("R-SVD error with matrix approximation of rank K = {}, \
+        with respect to truncated SVD error".format(k))
     plt.plot(sizes, errors[0], label = "truncated SVD")
     plt.plot(sizes, errors[1], linestyle = "solid", label = "Random SVD (Gauss)")
     plt.plot(sizes, errors[2], linestyle = "dashed", label = "Random SVD (Uniform)")
     plt.plot(sizes, errors[3], linestyle = "dotted", label = "Random SVD (Col sampling)")
-    plt.plot(sizes, errors[4], linestyle = "dotted", label = "Random SVD (DFR)")
+    plt.plot(sizes, errors[4], linestyle = "dotted", label = "Random SVD (SRHT)")
+    plt.plot(sizes, errors[5], linestyle = "dotted", label = "Random SVD (DCT)")
 
     for i, txt in enumerate(size_text_labels):
         ax.annotate(txt, (sizes[i], np.max(np.asarray(errors)[:, i])))
@@ -268,8 +281,9 @@ def fixed_rank_errors_photos(paths, k=100):
     plt.plot(sizes, durations[0], label = "truncated SVD")
     plt.plot(sizes, durations[1], linestyle="solid", label = "Random SVD (Gauss)")
     plt.plot(sizes, durations[2], linestyle="dashed", label = "Random SVD (Uniform)")
-    plt.plot(sizes, durations[3], linestyle="dotted", label = "Random SVD (Col sampling)")
-    plt.plot(sizes, durations[4], linestyle="dotted", label = "Random SVD (DFR)")
+    plt.plot(sizes, durations[3], linestyle="dashed", label = "Random SVD (Col sampling)")
+    plt.plot(sizes, durations[4], linestyle="dotted", label = "Random SVD (SRHT)")
+    plt.plot(sizes, durations[5], linestyle="dotted", label = "Random SVD (DCT)")
     
     for i, txt in enumerate(size_text_labels):
         ax2.annotate(txt, (sizes[i], np.max(np.asarray(durations)[:, i])))

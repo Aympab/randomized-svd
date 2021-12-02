@@ -36,10 +36,12 @@ def r_svd(A, k=0, kernel="gaussian", return_matrices=False, power_iteration=0):
         for c in Omega :
             random_int = randint(0, k)
             c[random_int] = 1
-    elif (kernel == "DFR"):
-        Omega = DFR_random_matrix(n, k)
+    elif (kernel == "SRHT"):
+        Omega = hadamard_random_matrix(n, k)
+    elif (kernel == "DCT"):
+        Omega = DCT_random_matrix(n, k)
     else:
-        raise ValueError("kernel must be either of 'uniform', 'gaussian', 'colsampling', 'DFR'.")
+        raise ValueError("kernel must be either of 'uniform', 'gaussian', 'colsampling', 'SRHT', 'DCT'.")
 
 
     #We randomly project k columns of A and create a Y matrix
