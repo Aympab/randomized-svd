@@ -319,10 +319,11 @@ def fixed_rank_error_power_iteration(path, k=100):
         
         
     plt.subplots(figsize=(10, 6))
-    plt.plot(range(3), np.ones(shape=np.arange(3).shape))
+    plt.plot(range(3), np.ones(shape=np.arange(3).shape), label="Truncated SVD")
     plt.plot(range(3), errors_rsvd_gauss, linestyle="dashed", label="R-SVD (Gaussian)")
     plt.plot(range(3), errors_rsvd_DCT, linestyle="dotted", label="R-SVD (DCT)")
     plt.legend()
+    plt.title("Power iteration effect on respective error for q in {1, 2, 3}")
     plt.xlabel("Power iteration q ")
     plt.ylabel("Respective error with truncated SVD")
     plt.grid()
