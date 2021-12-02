@@ -48,11 +48,11 @@ def r_svd(A, k=0, kernel="gaussian", return_matrices=False, power_iteration=0):
     Y = A @ Omega
     #Y = Y / np.linalg.norm(Y, axis=0)
 
-    #for i in range(power_iteration):
-    #    Y = A.T @ Y
-    #    Y = Y / np.linalg.norm(Y, axis=0)
-    #    Y = A @ Y 
-    #    Y = Y / np.linalg.norm(Y, axis=0)
+    for i in range(power_iteration):
+        Y = A.T @ Y
+        Y = Y / np.linalg.norm(Y, axis=0)
+        Y = A @ Y 
+        Y = Y / np.linalg.norm(Y, axis=0)
 
     #We compute QR on Y because it is small (m,k)
     Q,R = np.linalg.qr(Y)

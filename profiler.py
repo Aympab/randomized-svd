@@ -263,7 +263,7 @@ def fixed_rank_errors_photos(paths, k=100):
     plt.plot(sizes, errors[0], label = "truncated SVD")
     plt.plot(sizes, errors[1], linestyle = "solid", label = "Random SVD (Gauss)")
     plt.plot(sizes, errors[2], linestyle = "dashed", label = "Random SVD (Uniform)")
-    plt.plot(sizes, errors[3], linestyle = "dotted", label = "Random SVD (Col sampling)")
+    plt.plot(sizes, errors[3], linestyle = "dashed", label = "Random SVD (Col sampling)")
     plt.plot(sizes, errors[4], linestyle = "dotted", label = "Random SVD (SRHT)")
     plt.plot(sizes, errors[5], linestyle = "dotted", label = "Random SVD (DCT)")
 
@@ -271,7 +271,7 @@ def fixed_rank_errors_photos(paths, k=100):
         ax.annotate(txt, (sizes[i], np.max(np.asarray(errors)[:, i])))
 
     plt.xlabel("log(Size of Matrix N)")
-    plt.ylabel("Reconstruction error of svd")
+    plt.ylabel("Reconstruction error of r-svd respective to truncated svd")
     plt.xscale("log")
     plt.grid()
     plt.legend()
@@ -292,6 +292,39 @@ def fixed_rank_errors_photos(paths, k=100):
     plt.yscale("log")
     plt.xlabel("Size of Matrix N")
     plt.ylabel("log(Compute time)")
+    plt.grid()
+    plt.legend()
+    
+    plt.show()
+
+
+
+def fixed_rank_error_power_iteration(path, k=100):
+    errors_rsvd_gauss = []
+    errors_rsvd_DCT = []
+
+    svd_ratio = []
+    
+    M = np.asarray(toGrayScale(getColouredImage(path)))
+    shape = M.shape
+    if shape[0] < shape[1]:
+        M = M.transpose()
+
+    error, _ = cache_svd_photo(path, M, k)
+    svd_ratio.append(error / (shape[0] * shape[1]))
+
+    for i in range(0, 3):
+        errors_rsvd_gauss.append(np.linalg.norm(r_svd(M, k, kernel="gaussian", power_iteration=i) - M) / error)
+        errors_rsvd_DCT.append(np.linalg.norm(r_svd(M, k, kernel="DCT", power_iteration=i) - M) / error)
+        
+        
+    plt.subplots(figsize=(10, 6))
+    plt.plot(range(3), np.ones(shape=np.arange(3).shape))
+    plt.plot(range(3), errors_rsvd_gauss, linestyle="dashed", label="R-SVD (Gaussian)")
+    plt.plot(range(3), errors_rsvd_DCT, linestyle="dotted", label="R-SVD (DCT)")
+    plt.legend()
+    plt.xlabel("Power iteration q ")
+    plt.ylabel("Respective error with truncated SVD")
     plt.grid()
     plt.legend()
     
