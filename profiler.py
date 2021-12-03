@@ -301,7 +301,10 @@ def fixed_rank_errors_photos(paths, k=100):
 
 def fixed_rank_error_power_iteration(path, k=100):
     errors_rsvd_gauss = []
+    errors_rsvd_uni = []
+    errors_rsvd_cols = []
     errors_rsvd_DCT = []
+    errors_rsvd_SRHT = []
 
     svd_ratio = []
     
@@ -315,13 +318,19 @@ def fixed_rank_error_power_iteration(path, k=100):
 
     for i in range(0, 3):
         errors_rsvd_gauss.append(np.linalg.norm(r_svd(M, k, kernel="gaussian", power_iteration=i) - M) / error)
+        errors_rsvd_uni.append(np.linalg.norm(r_svd(M, k, kernel="uniform", power_iteration=i) - M) / error)
+        errors_rsvd_cols.append(np.linalg.norm(r_svd(M, k, kernel="colsampling", power_iteration=i) - M) / error)
         errors_rsvd_DCT.append(np.linalg.norm(r_svd(M, k, kernel="DCT", power_iteration=i) - M) / error)
+        errors_rsvd_SRHT.append(np.linalg.norm(r_svd(M, k, kernel="SRHT", power_iteration=i) - M) / error)
         
         
     plt.subplots(figsize=(10, 6))
     plt.plot(range(3), np.ones(shape=np.arange(3).shape), label="Truncated SVD")
     plt.plot(range(3), errors_rsvd_gauss, linestyle="dashed", label="R-SVD (Gaussian)")
+    plt.plot(range(3), errors_rsvd_uni, linestyle="dashed", label="R-SVD (Uniform)")
+    plt.plot(range(3), errors_rsvd_cols, linestyle="dashed", label="R-SVD (Colsampling)")
     plt.plot(range(3), errors_rsvd_DCT, linestyle="dotted", label="R-SVD (DCT)")
+    plt.plot(range(3), errors_rsvd_SRHT, linestyle="dotted", label="R-SVD (SRHT)")
     plt.legend()
     plt.title("Power iteration effect on respective error for q in {1, 2, 3}")
     plt.xlabel("Power iteration q ")

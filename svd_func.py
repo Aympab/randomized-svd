@@ -87,4 +87,3 @@ def svd_regular(A, k=0, return_matrices=False):
         return U, S, Vt
     else:
         return reconstruct(U, S, Vt, k=k)
-
