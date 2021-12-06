@@ -64,18 +64,25 @@ def execute_t_times(t, svd_func, A, k, kernel, verbose=1):
     
     return
 
-def fixed_rank_errors_random_matrixes(sizes, k=50):    
+def fixed_rank_errors_random_matrixes(sizes, k=50):   
+    """ Profiles error and duration for fixed rank random matrices
+
+    Args:
+        sizes (list of int) : Sizes to test the different
+        k (int): number max of columns to use in the randomized svd and the rank of the matrix
+
+    Returns:
+        null : used only for plotting
+    """  
     duration_exactsvd = []
     duration_rsvd_gauss = []
     duration_rsvd_uni = []
     duration_rsvd_col = []
-    #duration_rsvd_SRHT = []
     
     errors_exactsvd = []
     errors_rsvd_gauss = []
     errors_rsvd_uni = []
     errors_rsvd_col = []
-    #errors_rsvd_SRHT = []
     for size in sizes:
         M = rankk_random_matrix_generator(size, size, k)
 
@@ -99,10 +106,6 @@ def fixed_rank_errors_random_matrixes(sizes, k=50):
         e = perf_counter()
         duration_rsvd_col.append(e - s)
 
-        #s = perf_counter()
-        #errors_rsvd_SRHT.append(np.linalg.norm(r_svd(M, k, kernel="SRHT") - M))
-        #e = perf_counter()
-        #duration_rsvd_SRHT.append(e - s)
         
 
     # Plot compressed and original image
@@ -139,6 +142,16 @@ def fixed_rank_errors_random_matrixes(sizes, k=50):
     return 
 
 def cache_svd_photo(path, M, k):
+    """ caches the SVD to avoid computing it multiple times
+
+    Args:
+        path (string) : path of image
+        M (numpy 2D array) : Matrix
+        k (int): number of columns to use in truncated svd
+
+    Returns:
+        null : matrix error and compute duration
+    """  
     directory = "./resources/precomputed"
     try:
         os.stat(directory)
@@ -176,7 +189,16 @@ def cache_svd_photo(path, M, k):
     return error, duration
 
 
-def fixed_rank_errors_photos(paths, k=100):    
+def fixed_rank_errors_photos(paths, k=100):   
+    """ Launches r-svd for for different photos and plots errors and durations
+
+    Args:
+        paths (list of string) : paths of images
+        k (int): number of k to keep in randomized svd
+
+    Returns:
+        null : used only for plotting
+    """   
     duration_exactsvd = []
     duration_rsvd_gauss = []
     duration_rsvd_uni = []
@@ -300,6 +322,15 @@ def fixed_rank_errors_photos(paths, k=100):
 
 
 def fixed_rank_error_power_iteration(path, k=100):
+    """ Plots the effect of power iteration in relative error
+
+    Args:
+        path (list of string) : path of image
+        k (int) : number of k to keep in randomized svd
+
+    Returns:
+        null : used only for plotting
+    """   
     errors_rsvd_gauss = []
     errors_rsvd_uni = []
     errors_rsvd_cols = []

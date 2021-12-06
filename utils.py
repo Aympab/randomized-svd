@@ -78,7 +78,7 @@ def print_result(error, magnitude, duration, name):
 
 
 def DFR_random_matrix(n, l):
-    """ Creates a DFR matrix
+    """ Creates a DFR matrix of size n * l with F fourier matrix
     """
     if n < l:
         raise ValueError(f"l ({l}) can't be higher than n ({n})")
@@ -98,6 +98,8 @@ def DFR_random_matrix(n, l):
 
 
 def hadamard_random_matrix(n, l):
+    """ Creates a DFR matrix of size n * l with H Hadamard matrix
+    """
     if n < l:
         raise ValueError(f"l ({l}) can't be higher than n ({n})")
     
@@ -119,6 +121,8 @@ def hadamard_random_matrix(n, l):
     return (np.sqrt(size / l) * np.diag(D) @ H @ R)[:n]
 
 def DCT_random_matrix(n, l):
+    """ Creates a DFR matrix of size n * l with F a Discrete Cosine Transform matrix
+    """
     if n < l:
         raise ValueError(f"l ({l}) can't be higher than n ({n})")
 
