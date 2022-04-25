@@ -100,14 +100,10 @@ Nous allons observer le comportement de $\Omega$ en fonction de la méthode util
 Ensuite, nous étudierons ces différents $\Omega$ notamment à l'aide de SVD. <br>
 
 Prenons 3 matrices : <br>
-$$
-\Omega_{1} \in \mathbb{R}^{m \times n} : \Omega_{i,j} \sim \mathcal{N}(0,1) \\ 
-\ \\
-\Omega_{2} \in \mathbb{R}^{m \times n} : \Omega_{i,j} \sim \mathcal{U}([0,1]) \\
-\ \\
-\Omega_{3} \in \mathbb{R}^{m \times n} : \forall i \in \llbracket0~;~n\rrbracket,~ \exists!~j \sim \mathcal{U}(\llbracket0,m\rrbracket) : \Omega_{i,j} = 1 \\
-et\ \Omega_{i,k}=0 \ \ \forall~k \ne j
-$$
+<p align="center">
+    <img src="md_files/math.png"/>
+</p>
+
 - La première est une matrice à valeurs Gausiennes.<br>
 - La seconde est une matrice à valeurs Uniformes.<br>
 - La troisième est une matrice avec une unique valeur à 1 pour chaque colonne.<br>
